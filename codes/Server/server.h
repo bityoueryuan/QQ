@@ -1,28 +1,29 @@
-/********************************************************************************
- * Files         : server.h
- * Description   : 该文件为server端提供必要的头文件和定义
- ********************************************************************************/
 #ifndef SERVER_H
 #define SERVER_H
 
-#include <glib.h>
-#include <stdio.h>
-#include <string.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <sys/time.h>
-#include <unistd.h>
-#include <netdb.h>
-#include <netinet/in.h>
+#include <QObject>
+#include <QList>
+#include <QTcpServer>
+#include "clientsocket.h"
 
-#define OURPORT 8088
-#define MAX_USERS 10 
-#define MAX_LEN 2048
+class Server : public QTcpServer
+{
+    Q_OBJECT
+public:
+    explicit Server(QObject *parent = 0);
+    Server(qint16 port = 0);
+    QList<TcpClientSocket*> tcpclientsocketlist;
+protected:
+    void incomingConnection(qintptr socketDescriptor);//只要出现一个新的连接，就会自动调用这个函数
+protected slots:
+    void sliotupdateserver(QString, qint16);//用来处理tcpclient发过来的信号
+    void slotclientdisconnect(qint16);
+    void slotupdateserver(QString, qint16);
 
-int check(char * username,char *password);
-void insert(char * username,char *password);
+signals:
+    void updateserver(QString, qint16);//发送信号给界面，让界面更新信息
 
-#endif
+};
+
+
+#endif // SERVER_H
